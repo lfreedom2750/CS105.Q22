@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Minkowski Island</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 30px;
+    }
+
+    h2 {
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 6px 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    button:hover {
+      background: #005ecb;
+    }
+
+    canvas {
+      border: 3px solid #007bff;
+      background: white;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Minkowski Island Fractal</h2>
+
+  <div class="controls">
+    Level:
+    <input type="number" id="level" min="0" max="5" value="2">
+    <button onclick="render()">Draw</button>
+  </div>
+
+  <canvas id="canvas" width="600" height="600"></canvas>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawMinkowskiIsland(ctx, level) {
+      const size = 300;
+      const startX = 150;
+      const startY = 150;
+
+      const square = [
+        { x: startX, y: startY + size },       // Bottom-left
+        { x: startX + size, y: startY + size },// Bottom-right
+        { x: startX + size, y: startY },       // Top-right
+        { x: startX, y: startY }               // Top-left
+      ];
+
+      ctx.beginPath();
+      ctx.moveTo(square[0].x, square[0].y);
+
+      for (let i = 0; i < 4; i++) {
+        const from = square[i];
+        const to = square[(i + 1) % 4];
+        const path = generateMinkowskiEdge(from, to, level);
+
+        for (let j = 1; j < path.length; j++) {
+          ctx.lineTo(path[j].x, path[j].y);
+        }
+      }
+
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    function generateMinkowskiEdge(p1, p2, level) {
+      if (level === 0) return [p1, p2];
+
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const length = Math.sqrt(dx * dx + dy * dy);
+
+      const dirX = dx / length;
+      const dirY = dy / length;
+      const segment = length / 4;
+
+      const points = [];
+
+      const A = {
+        x: p1.x + dirX * segment,
+        y: p1.y + dirY * segment
+      };
+      points.push(...generateMinkowskiEdge(p1, A, level - 1));
+
+      const B1 = {
+        x: A.x + dirX * segment,
+        y: A.y + dirY * segment
+      };
+
+      const normalDir = {
+        x: -dirY,
+        y: dirX
+      };
+
+      const B2 = {
+        x: A.x + normalDir.x * segment,
+        y: A.y + normalDir.y * segment
+      };
+
+      const B3 = {
+        x: B2.x + dirX * segment,
+        y: B2.y + dirY * segment
+      };
+
+      points.push(...generateMinkowskiEdge(A, B2, level - 1));
+      points.push(...generateMinkowskiEdge(B2, B3, level - 1));
+      points.push(...generateMinkowskiEdge(B3, B1, level - 1));
+
+      const flipNormal = {
+        x: -normalDir.x,
+        y: -normalDir.y
+      };
+
+      const C1 = {
+        x: B1.x + flipNormal.x * segment,
+        y: B1.y + flipNormal.y * segment
+      };
+
+      const C2 = {
+        x: C1.x + dirX * segment,
+        y: C1.y + dirY * segment
+      };
+
+      const C3 = {
+        x: B1.x + dirX * segment,
+        y: B1.y + dirY * segment
+      };
+
+      points.push(...generateMinkowskiEdge(B1, C1, level - 1));
+      points.push(...generateMinkowskiEdge(C1, C2, level - 1));
+      points.push(...generateMinkowskiEdge(C2, C3, level - 1));
+
+      points.push(...generateMinkowskiEdge(C3, p2, level - 1));
+
+      return deduplicatePoints(points);
+    }
+
+    function deduplicatePoints(points) {
+      const result = [];
+      for (let i = 0; i < points.length; i++) {
+        if (
+          i === 0 ||
+          points[i].x !== points[i - 1].x ||
+          points[i].y !== points[i - 1].y
+        ) {
+          result.push(points[i]);
+        }
+      }
+      return result;
+    }
+
+    function render() {
+      clearCanvas();
+
+      const level = parseInt(document.getElementById("level").value, 10);
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 1.2;
+
+      drawMinkowskiIsland(ctx, Math.max(0, Math.min(level, 4)));
+    }
+  </script>
+</body>
+</html>

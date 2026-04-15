@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three.js - Biến đổi đối tượng và Camera</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+        }
+
+        #webgl {
+            width: 100%;
+            height: 100%;
+        }
+
+        #control-panel {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 320px;
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #dcdfe6;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            z-index: 100;
+        }
+
+        #control-panel h2 {
+            margin: 0 0 12px;
+            font-size: 20px;
+            color: #1f2d3d;
+            text-align: center;
+        }
+
+        .group {
+            margin-bottom: 18px;
+            padding: 12px;
+            border: 1px solid #e6eaf0;
+            border-radius: 10px;
+            background: #fafbfc;
+        }
+
+        .group-title {
+            margin-bottom: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #2c3e50;
+            border-left: 4px solid #4a90e2;
+            padding-left: 8px;
+        }
+
+        .control-item {
+            margin-bottom: 10px;
+        }
+
+        .control-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-item label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 13px;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        .control-item span.value {
+            min-width: 48px;
+            text-align: right;
+            color: #4a90e2;
+            font-weight: bold;
+        }
+
+        .control-item input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        button {
+            flex: 1;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        #reset-object {
+            background: #4a90e2;
+            color: white;
+        }
+
+        #reset-object:hover {
+            background: #357abd;
+        }
+
+        #reset-camera {
+            background: #27ae60;
+            color: white;
+        }
+
+        #reset-camera:hover {
+            background: #1f8a4c;
+        }
+
+        #note {
+            margin-top: 10px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #666;
+            background: #fff8e7;
+            border: 1px solid #f3df9b;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        @media (max-width: 768px) {
+            #control-panel {
+                width: calc(100vw - 24px);
+                left: 12px;
+                top: 12px;
+                max-height: 55vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="control-panel">
+        <h2>Bảng điều khiển</h2>
+
+        <div class="group">
+            <div class="group-title">Biến đổi đối tượng</div>
+
+            <div class="control-item">
+                <label>Translate X <span class="value" id="txValue">0</span></label>
+                <input type="range" id="translateX" min="-5" max="5" step="0.1" value="0">
+            </div>
+
+            <div class="control-item">
+                <label>Translate Y <span class="value" id="tyValue">0.5</span></label>
+                <input type="range" id="translateY" min="0" max="5" step="0.1" value="0.5">
+            </div>
+
+            <div class="control-item">
+                <label>Translate Z <span class="value" id="tzValue">0</span></label>
+                <input type="range" id="translateZ" min="-5" max="5" step="0.1" value="0">
+            </div>
+
+            <div class="control-item">
+                <label>Rotate X <span class="value" id="rxValue">0</span></label>
+                <input type="range" id="rotateX" min="0" max="6.28" step="0.01" value="0">
+            </div>
+
+            <div class="control-item">
+                <label>Rotate Y <span class="value" id="ryValue">0</span></label>
+                <input type="range" id="rotateY" min="0" max="6.28" step="0.01" value="0">
+            </div>
+
+            <div class="control-item">
+                <label>Rotate Z <span class="value" id="rzValue">0</span></label>
+                <input type="range" id="rotateZ" min="0" max="6.28" step="0.01" value="0">
+            </div>
+
+            <div class="control-item">
+                <label>Scale <span class="value" id="scaleValue">1</span></label>
+                <input type="range" id="scale" min="0.2" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="button-row">
+                <button id="reset-object">Reset đối tượng</button>
+            </div>
+        </div>
+
+        <div class="group">
+            <div class="group-title">Camera / VRP</div>
+
+            <div class="control-item">
+                <label>Camera X <span class="value" id="camXValue">3</span></label>
+                <input type="range" id="cameraX" min="-10" max="10" step="0.1" value="3">
+            </div>
+
+            <div class="control-item">
+                <label>Camera Y <span class="value" id="camYValue">3</span></label>
+                <input type="range" id="cameraY" min="-10" max="10" step="0.1" value="3">
+            </div>
+
+            <div class="control-item">
+                <label>Camera Z <span class="value" id="camZValue">6</span></label>
+                <input type="range" id="cameraZ" min="-10" max="15" step="0.1" value="6">
+            </div>
+
+            <div class="button-row">
+                <button id="reset-camera">Reset camera</button>
+            </div>
+        </div>
+
+        <div class="group">
+            <div class="group-title">LookAt</div>
+
+            <div class="control-item">
+                <label>LookAt X <span class="value" id="lookXValue">0</span></label>
+                <input type="range" id="lookAtX" min="-5" max="5" step="0.1" value="0">
+            </div>
+
+            <div class="control-item">
+                <label>LookAt Y <span class="value" id="lookYValue">0</span></label>
+                <input type="range" id="lookAtY" min="-5" max="5" step="0.1" value="0">
+            </div>
+
+            <div class="control-item">
+                <label>LookAt Z <span class="value" id="lookZValue">0</span></label>
+                <input type="range" id="lookAtZ" min="-5" max="5" step="0.1" value="0">
+            </div>
+        </div>
+
+        <div id="note">
+            Dùng chuột kéo thanh trượt để thay đổi phép tịnh tiến, quay, tỉ lệ của đối tượng, đồng thời thay đổi vị trí camera (VRP) và điểm nhìn LookAt.
+        </div>
+    </div>
+
+    <div id="webgl"></div>
+
+    <script src="./lib/three.js"></script>
+    <script src="./main.js"></script>
+</body>
+</html>

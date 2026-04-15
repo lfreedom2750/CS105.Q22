@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Julia Set</title>
+
+<style>
+body {
+    background: black;
+    color: white;
+    text-align: center;
+    font-family: Arial;
+}
+canvas {
+    border: 1px solid #444;
+    cursor: crosshair;
+}
+</style>
+</head>
+
+<body>
+
+<h2>✨ Julia Set (Di chuột để thay đổi hình)</h2>
+<p>c = <span id="cval"></span></p>
+
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const width = canvas.width;
+const height = canvas.height;
+
+let cx = -0.7;
+let cy = 0.27015;
+
+const maxIter = 100;
+
+// ==========================
+// VẼ JULIA
+// ==========================
+function drawJulia() {
+    const img = ctx.createImageData(width, height);
+    const data = img.data;
+
+    for (let px = 0; px < width; px++) {
+        for (let py = 0; py < height; py++) {
+
+            let x = (px / width) * 3 - 1.5;
+            let y = (py / height) * 3 - 1.5;
+
+            let iter = 0;
+
+            while (x*x + y*y <= 4 && iter < maxIter) {
+                let xtemp = x*x - y*y + cx;
+                y = 2*x*y + cy;
+                x = xtemp;
+                iter++;
+            }
+
+            let i = (py * width + px) * 4;
+
+            if (iter === maxIter) {
+                data[i] = 0;
+                data[i+1] = 0;
+                data[i+2] = 0;
+                data[i+3] = 255;
+            } else {
+                let t = iter / maxIter;
+
+                data[i]   = 9*(1-t)*t*t*t*255;
+                data[i+1] = 15*(1-t)*(1-t)*t*t*255;
+                data[i+2] = 8.5*(1-t)*(1-t)*(1-t)*t*255;
+                data[i+3] = 255;
+            }
+        }
+    }
+
+    ctx.putImageData(img, 0, 0);
+
+    document.getElementById("cval").innerText =
+        cx.toFixed(3) + " + " + cy.toFixed(3) + "i";
+}
+
+// ==========================
+// INTERACTION
+// ==========================
+canvas.addEventListener("mousemove", (e) => {
+    let rect = canvas.getBoundingClientRect();
+
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // map chuột → giá trị c
+    cx = (x / width) * 2 - 1;
+    cy = (y / height) * 2 - 1;
+
+    drawJulia();
+});
+
+// ==========================
+// RUN
+// ==========================
+drawJulia();
+
+</script>
+
+</body>
+</html>

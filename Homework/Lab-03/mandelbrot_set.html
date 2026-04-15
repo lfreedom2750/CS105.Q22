@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Mandelbrot Set</title>
+
+<style>
+body {
+    background: black;
+    color: white;
+    text-align: center;
+    font-family: Arial;
+}
+canvas {
+    border: 1px solid #444;
+    cursor: crosshair;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🌀 Mandelbrot Set (Zoom bằng click)</h2>
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let width = canvas.width;
+let height = canvas.height;
+
+// vùng phức ban đầu
+let xmin = -2.5, xmax = 1;
+let ymin = -1.5, ymax = 1.5;
+
+const maxIter = 100;
+
+// ==========================
+// VẼ MANDELBROT
+// ==========================
+function drawMandelbrot() {
+    const image = ctx.createImageData(width, height);
+    const data = image.data;
+
+    for (let px = 0; px < width; px++) {
+        for (let py = 0; py < height; py++) {
+
+            let x0 = xmin + (px / width) * (xmax - xmin);
+            let y0 = ymin + (py / height) * (ymax - ymin);
+
+            let x = 0;
+            let y = 0;
+            let iter = 0;
+
+            while (x*x + y*y <= 4 && iter < maxIter) {
+                let xtemp = x*x - y*y + x0;
+                y = 2*x*y + y0;
+                x = xtemp;
+                iter++;
+            }
+
+            let index = (py * width + px) * 4;
+
+            if (iter === maxIter) {
+                // điểm thuộc Mandelbrot → đen
+                data[index] = 0;
+                data[index+1] = 0;
+                data[index+2] = 0;
+                data[index+3] = 255;
+            } else {
+                // màu gradient
+                let color = iter * 5;
+
+                data[index] = color;
+                data[index+1] = color * 0.5;
+                data[index+2] = 255 - color;
+                data[index+3] = 255;
+            }
+        }
+    }
+
+    ctx.putImageData(image, 0, 0);
+}
+
+// ==========================
+// ZOOM (click chuột)
+// ==========================
+canvas.addEventListener("click", function(e) {
+    let rect = canvas.getBoundingClientRect();
+
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    let cx = xmin + (x / width) * (xmax - xmin);
+    let cy = ymin + (y / height) * (ymax - ymin);
+
+    let zoom = 0.5;
+
+    let dx = (xmax - xmin) * zoom;
+    let dy = (ymax - ymin) * zoom;
+
+    xmin = cx - dx/2;
+    xmax = cx + dx/2;
+    ymin = cy - dy/2;
+    ymax = cy + dy/2;
+
+    drawMandelbrot();
+});
+
+// ==========================
+// RUN
+// ==========================
+drawMandelbrot();
+
+</script>
+
+</body>
+</html>
