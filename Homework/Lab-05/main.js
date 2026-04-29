@@ -1,10 +1,11 @@
 var scene, camera, renderer;
 var box, plane;
+var ambientLight, directionalLight;
 var lookAtPoint = new THREE.Vector3(0, 0, 0);
 
 function init() {
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0xf3f7fb, 0.02);
+    scene.fog = new THREE.FogExp2(0x87ceeb, 0.02);
 
     box = getBox(1, 1, 1);
     plane = getPlane(20);
@@ -18,12 +19,10 @@ function init() {
     box.castShadow = true;
     plane.receiveShadow = true;
 
-    // ánh sáng môi trường
-    var ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
-    // ánh sáng chính
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(5, 10, 7);
     directionalLight.castShadow = true;
     scene.add(directionalLight);
@@ -92,7 +91,13 @@ function bindControls() {
         "rotateX", "rotateY", "rotateZ",
         "scale",
         "cameraX", "cameraY", "cameraZ",
-        "lookAtX", "lookAtY", "lookAtZ"
+        "lookAtX", "lookAtY", "lookAtZ",
+
+        "ambientLight", "directionalLight",
+
+        "boxColor", "planeColor",
+        "ambientColor", "directionalColor",
+        "backgroundColor"
     ];
 
     controls.forEach(function(id) {
@@ -150,6 +155,30 @@ function applyTransforms() {
     updateValue("lookXValue", lookX);
     updateValue("lookYValue", lookY);
     updateValue("lookZValue", lookZ);
+
+    var ambientIntensity = parseFloat(document.getElementById("ambientLight").value);
+    var directionalIntensity = parseFloat(document.getElementById("directionalLight").value);
+
+    ambientLight.intensity = ambientIntensity;
+    directionalLight.intensity = directionalIntensity;
+
+    updateValue("ambientValue", ambientIntensity);
+    updateValue("directionalValue", directionalIntensity);
+
+    var boxColor = document.getElementById("boxColor").value;
+    var planeColor = document.getElementById("planeColor").value;
+    var ambientColor = document.getElementById("ambientColor").value;
+    var directionalColor = document.getElementById("directionalColor").value;
+    var backgroundColor = document.getElementById("backgroundColor").value;
+
+    box.material.color.set(boxColor);
+    plane.material.color.set(planeColor);
+
+    ambientLight.color.set(ambientColor);
+    directionalLight.color.set(directionalColor);
+
+    renderer.setClearColor(backgroundColor);
+    scene.fog.color.set(backgroundColor);
 }
 
 function updateValue(id, value) {
@@ -192,5 +221,7 @@ function update() {
     renderer.render(scene, camera);
     requestAnimationFrame(update);
 }
+
+
 
 init();
