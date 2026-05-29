@@ -65,13 +65,73 @@
           <h3>Scene Settings</h3>
           <label>
             Sun Intensity:
-            <input type="range" id="sunIntensity" min="0" max="2" step="0.1" value="1.2" />
-          </label>
-          <label>
-            Object Height:
-            <input type="range" id="objectHeight" min="0" max="5" step="0.5" value="2" />
+            <input type="range" id="sunIntensity" min="0" max="2" step="0.1" value="1.0" />
           </label>
           <button id="btnRandomize">Randomize Scene</button>
+        </div>
+
+        <div class="panel sun-controls">
+          <h3>Sun Position</h3>
+          <label>
+            X: <span id="sunXVal">-8</span>
+            <input type="range" id="sunX" min="-30" max="30" step="0.5" value="-8" />
+          </label>
+          <label>
+            Y: <span id="sunYVal">14</span>
+            <input type="range" id="sunY" min="5" max="30" step="0.5" value="14" />
+          </label>
+          <label>
+            Z: <span id="sunZVal">-4</span>
+            <input type="range" id="sunZ" min="-25" max="10" step="0.5" value="-4" />
+          </label>
+        </div>
+
+        <div class="panel camera-controls">
+          <h3>Camera Position</h3>
+          <label>
+            X: <span id="camXVal">0</span>
+            <input type="range" id="camX" min="-20" max="20" step="0.5" value="0" />
+          </label>
+          <label>
+            Y: <span id="camYVal">4</span>
+            <input type="range" id="camY" min="2" max="15" step="0.5" value="4" />
+          </label>
+          <label>
+            Z: <span id="camZVal">18</span>
+            <input type="range" id="camZ" min="5" max="30" step="0.5" value="18" />
+          </label>
+        </div>
+
+        <div class="panel object-controls">
+          <h3>Object 1 - Sphere</h3>
+          <label>
+            X: <span id="sphereXVal">-3</span>
+            <input type="range" id="sphereX" min="-20" max="20" step="0.5" value="-3" />
+          </label>
+          <label>
+            Y: <span id="sphereYVal">3.5</span>
+            <input type="range" id="sphereY" min="1" max="15" step="0.5" value="3.5" />
+          </label>
+          <label>
+            Z: <span id="sphereZVal">-2</span>
+            <input type="range" id="sphereZ" min="-25" max="10" step="0.5" value="-2" />
+          </label>
+        </div>
+
+        <div class="panel object-controls">
+          <h3>Object 2 - Box</h3>
+          <label>
+            X: <span id="boxXVal">5</span>
+            <input type="range" id="boxX" min="-20" max="20" step="0.5" value="5" />
+          </label>
+          <label>
+            Y: <span id="boxYVal">3.5</span>
+            <input type="range" id="boxY" min="1" max="15" step="0.5" value="3.5" />
+          </label>
+          <label>
+            Z: <span id="boxZVal">-6</span>
+            <input type="range" id="boxZ" min="-25" max="10" step="0.5" value="-6" />
+          </label>
         </div>
 
         <div class="panel">
@@ -89,8 +149,11 @@
           <ul class="instructions">
             <li>Drag to rotate camera</li>
             <li>Scroll to zoom</li>
-            <li>Drag sun to move light</li>
-            <li>Drag objects to move them</li>
+            <li>Drag sun = move XZ</li>
+            <li>Scroll on sun = up/down</li>
+            <li>Drag objects = move XZ</li>
+            <li>Scroll while dragging = up/down</li>
+            <li>Use sliders to adjust</li>
           </ul>
         </div>
       </div>

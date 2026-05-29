@@ -491,6 +491,27 @@ function onObjectMouseUp() {
   controls.enabled = true;
 }
 
+// ============== SCROLL TO MOVE OBJECTS UP/DOWN ==============
+container.addEventListener('wheel', (event) => {
+  if (isDraggingObject && draggedObject) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    draggedObject.position.y -= event.deltaY * 0.02;
+    draggedObject.position.y = Math.max(draggedObject.userData.size, 15);
+
+    const objIndex = objects.indexOf(draggedObject);
+    if (objIndex >= 0) {
+      initialObjects[objIndex].pos[1] = draggedObject.position.y;
+    }
+
+    draggedObject.material.emissiveIntensity = 0.2;
+    setTimeout(() => { draggedObject.material.emissiveIntensity = 0.03; }, 200);
+
+    drawRays();
+  }
+}, { passive: false });
+
 container.addEventListener('mousedown', onObjectMouseDown);
 container.addEventListener('mousemove', onObjectMouseMove);
 container.addEventListener('mouseup', onObjectMouseUp);
@@ -534,11 +555,105 @@ document.getElementById('sunIntensity').addEventListener('input', (e) => {
   glowMaterial.opacity = 0.25 + settings.sunIntensity * 0.15;
 });
 
-document.getElementById('objectHeight').addEventListener('input', (e) => {
-  const height = parseFloat(e.target.value);
-  objects.forEach((obj) => {
-    obj.position.y = height + obj.userData.size;
-  });
+// ============== SUN POSITION CONTROLS ==============
+document.getElementById('sunX').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('sunXVal').textContent = val;
+  sunGroup.position.x = val;
+  sunLight.position.x = val;
+  drawRays();
+});
+
+document.getElementById('sunY').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('sunYVal').textContent = val;
+  sunGroup.position.y = val;
+  sunLight.position.y = val;
+  drawRays();
+});
+
+document.getElementById('sunZ').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('sunZVal').textContent = val;
+  sunGroup.position.z = val;
+  sunLight.position.z = val;
+  drawRays();
+});
+
+// ============== CAMERA POSITION CONTROLS ==============
+document.getElementById('camX').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('camXVal').textContent = val;
+  camera.position.x = val;
+  cameraPos.x = val;
+  camera.lookAt(0, 2.5, 0);
+  drawRays();
+});
+
+document.getElementById('camY').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('camYVal').textContent = val;
+  camera.position.y = val;
+  cameraPos.y = val;
+  camera.lookAt(0, 2.5, 0);
+  drawRays();
+});
+
+document.getElementById('camZ').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('camZVal').textContent = val;
+  camera.position.z = val;
+  cameraPos.z = val;
+  camera.lookAt(0, 2.5, 0);
+  drawRays();
+});
+
+// ============== OBJECT POSITION CONTROLS ==============
+document.getElementById('sphereX').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('sphereXVal').textContent = val;
+  objects[0].position.x = val;
+  initialObjects[0].pos[0] = val;
+  drawRays();
+});
+
+document.getElementById('sphereY').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('sphereYVal').textContent = val;
+  objects[0].position.y = val;
+  initialObjects[0].pos[1] = val;
+  drawRays();
+});
+
+document.getElementById('sphereZ').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('sphereZVal').textContent = val;
+  objects[0].position.z = val;
+  initialObjects[0].pos[2] = val;
+  drawRays();
+});
+
+document.getElementById('boxX').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('boxXVal').textContent = val;
+  objects[1].position.x = val;
+  initialObjects[1].pos[0] = val;
+  drawRays();
+});
+
+document.getElementById('boxY').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('boxYVal').textContent = val;
+  objects[1].position.y = val;
+  initialObjects[1].pos[1] = val;
+  drawRays();
+});
+
+document.getElementById('boxZ').addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('boxZVal').textContent = val;
+  objects[1].position.z = val;
+  initialObjects[1].pos[2] = val;
   drawRays();
 });
 

@@ -268,6 +268,22 @@ button:hover {
   background: #2ecc71;
 }
 
+.object-controls h3 {
+  border-bottom-color: #5096ff;
+}
+
+.object-controls:last-of-type h3 {
+  border-bottom-color: #ff5a5a;
+}
+
+.sun-controls h3 {
+  border-bottom-color: #ffdd44;
+}
+
+.camera-controls h3 {
+  border-bottom-color: #888888;
+}
+
 @media (max-width: 900px) {
   .main-content {
     flex-direction: column;
